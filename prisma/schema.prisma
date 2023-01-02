@@ -11,6 +11,7 @@ datasource db {
 model boards {
   id          Int    @id @default(autoincrement())
   name        String @db.VarChar
+  slug        String @db.VarChar
   description String
   pfp         String?
   cover       String?
@@ -23,9 +24,9 @@ model boards {
 }
 
 model pins {
-  id         Int    @id @default(autoincrement())
-  user       String @db.VarChar
-  board      String
-  post       String @db.VarChar
-  created_at DateTime? @default(now()) @db.Timestamptz(6)
+  id           Int    @id @default(autoincrement())
+  userId       String @db.VarChar
+  boardId      String? @db.VarChar
+  postId       String @db.VarChar
+  created_at   DateTime? @default(now()) @db.Timestamptz(6)
 }

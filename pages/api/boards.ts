@@ -13,8 +13,47 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         const requestType = req.query.type
         const id = req.query.id
         const profile = req.query.profile
+        const name = req.query.name
         const data = req.body
-        console.log('board request', requestType, id, profile, data);
+        const slug = name?.toLowerCase()
+       // console.log('board request', requestType, id, profile, data);
+        
+        if (requestType === 'board' && id !== null) {
+            const board = await prisma.boards.findUnique({
+                where: {
+                    id: Number(id)
+                }
+            })
+            return res.status(200).json(board)
+        }
+
+        if (requestType === 'checkName' && name !== null && profile !== null) {
+            // const board = await prisma.$queryRaw`SELECT * FROM boards WHERE name ILIKE '${name}'`;
+            // console.log(board)
+            // console.log('check name', name, profile)
+            const board = await prisma.$queryRawUnsafe(
+                'SELECT * FROM "boards" WHERE (name = $1 OR name ILIKE $2)',
+                name,
+                `%${name}`
+            )
+            // const board = await prisma.boards.findMany({
+            //     where: {
+            //         OR: [
+            //             {
+            //                 name:  name as string
+            //             },
+            //             {
+            //                 name: slug as string
+            //             }
+            //         ],
+            //     }
+            // })
+            if (board && board.length > 0 && board[0].user === profile) {
+                return res.status(200).json({ success: false, message: 'Board name already exists!' })
+            }
+            return res.status(200).json({ success: true, message: 'Board name is available!' })
+   
+        }
 
         if (requestType === 'profile' && id !== null) {
             const boards = await prisma.boards.findMany({
@@ -62,8 +101,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 const board = await prisma.boards.create({
                     data: {
                         name: body.data.name,
-                        description: body.data.description,
+                        slug: body.data.slug,
+                        description: body.data.description ? body.data.description : '',
                         user: body.data.user,
+                        pfp: body.data.pfp ? body.data.pfp : '',
+                        cover: body.data.cover ? body.data.cover : '',
+                        category: body.data.category ? body.data.category : '',
+                        tags: body.data.tags ? body.data.tags : '',
                         is_private: body.data.is_private,
                     }
                 })
@@ -85,13 +129,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 },
                 data: {
                     name: body.data.name,
-                    description: body.data.description,
+                    slug: body.data.slug,
+                    description: body.data.description ? body.data.description : '',
                     user: body.data.user,
-                    pfp: body.data.pfp,
-                    cover: body.data.cover,
+                    pfp: body.data.pfp ? body.data.pfp : '',
+                    cover: body.data.cover ? body.data.cover : '',
                     is_private: body.data.is_private,
-                    category: body.data.category,
-                    tags: body.data.tags,
+                    category: body.data.category ? body.data.category : '',
+                    tags: body.data.tags ? body.data.tags : '',
                 }
             })
             return res.status(200).json(board)
@@ -107,7 +152,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             if (pinsExist > 0) {
                 const pins = await prisma.pins.findMany({
                     where: {
-                        board: id
+                        boardId: id as string
                     }
                 })
                 pins.forEach(async pin => {
