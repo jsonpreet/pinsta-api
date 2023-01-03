@@ -15,7 +15,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         const profile = req.query.profile
         const name = req.query.name
         const data = req.body
-        const slug = name?.toLowerCase()
        // console.log('board request', requestType, id, profile, data);
         
         if (requestType === 'board' && id !== null) {
@@ -48,6 +47,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             //         ],
             //     }
             // })
+            // @ts-ignore
             if (board && board.length > 0 && board[0].user === profile) {
                 return res.status(200).json({ success: false, message: 'Board name already exists!' })
             }
@@ -67,8 +67,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         if (requestType === 'profileBoard' && id === null && profile !== null) {
             const board = await prisma.pins.findMany({
                 where: {
-                    user: profile as string,
-                    board: id as string
+                    userId: profile as string,
+                    boardId: id as string
                 }
             })
             return res.status(200).json(board)   
@@ -146,13 +146,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             // delete pins
             const pinsExist = await prisma.pins.count({
                 where: {
-                    board: id
+                    boardId: id
                 } 
             })
             if (pinsExist > 0) {
                 const pins = await prisma.pins.findMany({
                     where: {
-                        boardId: id as string
+                        boardId: id
                     }
                 })
                 pins.forEach(async pin => {
@@ -171,19 +171,5 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             })
             return res.status(200).json(board)
         }
-
-        // const board = await prisma.boards.create({
-        //     data: {
-        //         name: req.body.name,
-        //         description: req.body.description,
-        //         user: req.body.user,
-        //         pfp: req.body.pfp,
-        //         cover: req.body.cover,
-        //         is_private: req.body.is_private,
-        //         category: req.body.category,
-        //         tags: req.body.tags,
-        //     }
-        // })
-        // res.status(200).json(board)
     }
 }
