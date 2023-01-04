@@ -14,9 +14,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         const id = req.query.id
         const profile = req.query.profile
         const name = req.query.name
-        const data = req.body
-        const slug = name?.toLowerCase()
-       // console.log('board request', requestType, id, profile, data);
+        const slug = req.query.slug
         
         if (requestType === 'board' && id !== null) {
             const board = await prisma.boards.findUnique({
@@ -26,6 +24,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             })
             return res.status(200).json(board)
         }
+        
+        if (requestType === 'boardBySlug' && slug !== null) {
+            const board = await prisma.boards.findMany({
+                where: {
+                    slug: slug as string
+                }
+            })
+            return res.status(200).json(board)
+        }
+
 
         if (requestType === 'checkName' && name !== null && profile !== null) {
             // const board = await prisma.$queryRaw`SELECT * FROM boards WHERE name ILIKE '${name}'`;
@@ -67,8 +75,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         if (requestType === 'profileBoard' && id === null && profile !== null) {
             const board = await prisma.pins.findMany({
                 where: {
-                    user: profile as string,
-                    board: id as string
+                    userId: profile as string,
+                    boardId: id as string
                 }
             })
             return res.status(200).json(board)   
@@ -95,7 +103,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         const body = req.body
         const data = req.body.data
         const id = data.id as string
-        console.log('board request', body)
+
         if (body.type === 'create') {
             try {
                 const board = await prisma.boards.create({
@@ -171,19 +179,5 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             })
             return res.status(200).json(board)
         }
-
-        // const board = await prisma.boards.create({
-        //     data: {
-        //         name: req.body.name,
-        //         description: req.body.description,
-        //         user: req.body.user,
-        //         pfp: req.body.pfp,
-        //         cover: req.body.cover,
-        //         is_private: req.body.is_private,
-        //         category: req.body.category,
-        //         tags: req.body.tags,
-        //     }
-        // })
-        // res.status(200).json(board)
     }
 }
