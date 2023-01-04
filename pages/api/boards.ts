@@ -15,6 +15,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         const profile = req.query.profile
         const name = req.query.name
         const data = req.body
+        const slug = req.query.slug
        // console.log('board request', requestType, id, profile, data);
         
         if (requestType === 'board' && id !== null) {
@@ -37,26 +38,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
 
         if (requestType === 'checkName' && name !== null && profile !== null) {
-            // const board = await prisma.$queryRaw`SELECT * FROM boards WHERE name ILIKE '${name}'`;
-            // console.log(board)
-            // console.log('check name', name, profile)
             const board = await prisma.$queryRawUnsafe(
                 'SELECT * FROM "boards" WHERE (name = $1 OR name ILIKE $2)',
                 name,
                 `%${name}`
             )
-            // const board = await prisma.boards.findMany({
-            //     where: {
-            //         OR: [
-            //             {
-            //                 name:  name as string
-            //             },
-            //             {
-            //                 name: slug as string
-            //             }
-            //         ],
-            //     }
-            // })
             // @ts-ignore
             if (board && board.length > 0 && board[0].user === profile) {
                 return res.status(200).json({ success: false, message: 'Board name already exists!' })
