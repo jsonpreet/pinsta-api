@@ -122,20 +122,5 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             
             return res.status(200).json(unsaved)
         }
-
-        //console.log(requestType, id, data);
-        // const board = await prisma.boards.create({
-        //     data: {
-        //         name: req.body.name,
-        //         description: req.body.description,
-        //         user: req.body.user,
-        //         pfp: req.body.pfp,
-        //         cover: req.body.cover,
-        //         is_private: req.body.is_private,
-        //         category: req.body.category,
-        //         tags: req.body.tags,
-        //     }
-        // })
-        // res.status(200).json(board)
     }
 }

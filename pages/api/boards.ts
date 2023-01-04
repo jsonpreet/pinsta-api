@@ -14,7 +14,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         const id = req.query.id
         const profile = req.query.profile
         const name = req.query.name
-        const slug = req.query.slug
+        const data = req.body
+       // console.log('board request', requestType, id, profile, data);
         
         if (requestType === 'board' && id !== null) {
             const board = await prisma.boards.findUnique({
@@ -56,6 +57,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             //         ],
             //     }
             // })
+            // @ts-ignore
             if (board && board.length > 0 && board[0].user === profile) {
                 return res.status(200).json({ success: false, message: 'Board name already exists!' })
             }
@@ -154,13 +156,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             // delete pins
             const pinsExist = await prisma.pins.count({
                 where: {
-                    board: id
+                    boardId: id
                 } 
             })
             if (pinsExist > 0) {
                 const pins = await prisma.pins.findMany({
                     where: {
-                        boardId: id as string
+                        boardId: id
                     }
                 })
                 pins.forEach(async pin => {
