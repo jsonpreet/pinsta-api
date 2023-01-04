@@ -54,7 +54,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         if (requestType === 'profile' && id !== null) {
             const boards = await prisma.boards.findMany({
                 where: {
-                    user: id as string
+                    user_id: id as string
                 }
             })
             return res.status(200).json(boards)
@@ -63,8 +63,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         if (requestType === 'profileBoard' && id === null && profile !== null) {
             const board = await prisma.pins.findMany({
                 where: {
-                    userId: profile as string,
-                    boardId: id as string
+                    user_id: profile as string,
+                    board_id: id as string
                 }
             })
             return res.status(200).json(board)   
@@ -99,7 +99,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                         name: body.data.name,
                         slug: body.data.slug,
                         description: body.data.description ? body.data.description : '',
-                        user: body.data.user,
+                        user_id: body.data.user,
                         pfp: body.data.pfp ? body.data.pfp : '',
                         cover: body.data.cover ? body.data.cover : '',
                         category: body.data.category ? body.data.category : '',
@@ -127,7 +127,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                     name: body.data.name,
                     slug: body.data.slug,
                     description: body.data.description ? body.data.description : '',
-                    user: body.data.user,
+                    user_id: body.data.user,
                     pfp: body.data.pfp ? body.data.pfp : '',
                     cover: body.data.cover ? body.data.cover : '',
                     is_private: body.data.is_private,
@@ -142,13 +142,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             // delete pins
             const pinsExist = await prisma.pins.count({
                 where: {
-                    boardId: id
+                    board_id: id
                 } 
             })
             if (pinsExist > 0) {
                 const pins = await prisma.pins.findMany({
                     where: {
-                        boardId: id
+                        board_id: id
                     }
                 })
                 pins.forEach(async pin => {

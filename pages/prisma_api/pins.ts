@@ -20,8 +20,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             const pinsExist = await prisma.pins.count({
                 where: {
                     AND: [
-                        { userId: profile as string },
-                        { boardId: id as string  }
+                        { user_id: profile as string },
+                        { board_id: id as string  }
                     ],
                 }
             })
@@ -33,8 +33,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             const board = await prisma.pins.findMany({
                 where: {
                     AND: [
-                        { userId: profile as string },
-                        { boardId: id as string }
+                        { user_id: profile as string },
+                        { board_id: id as string }
                     ],
                 }
             })
@@ -44,7 +44,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         if (requestType === 'profile' && id !== null) {
             const boards = await prisma.pins.findMany({
                 where: {
-                    userId: id as string
+                    AND: [
+                        { user_id: profile as string },
+                        { board_id: '' }
+                    ],
                 }
             })
             return res.status(200).json(boards)
@@ -53,7 +56,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         if (requestType === 'board' && id !== null) {
             const board = await prisma.pins.findMany({
                 where: {
-                    boardId: id as string
+                    board_id: id as string
                 }
             })
             return res.status(200).json(board)
@@ -69,8 +72,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             const checked = await prisma.pins.findMany({
                 where: {
                     AND: [
-                        { userId: id as string },
-                        { postId: pin as string }
+                        { user_id: id as string },
+                        { post_id: pin as string }
                     ],
                 }
             })
@@ -90,9 +93,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             const check = await prisma.pins.findMany({
                 where: {
                     AND: [
-                        { postId: body.data.post },
-                        { userId: body.data.user },
-                        { boardId: body.data.board }
+                        { post_id: body.data.post },
+                        { user_id: body.data.user },
+                        { board_id: body.data.board }
                     ],
                 }
             })
@@ -101,9 +104,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             }
             const pin = await prisma.pins.create({
                 data: {
-                    userId: body.data.user,
-                    boardId: body.data.board,
-                    postId: body.data.post
+                    user_id: body.data.user,
+                    board_id: body.data.board,
+                    post_id: body.data.post
                 }
             })
             
@@ -114,8 +117,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             const unsaved = await prisma.pins.deleteMany({
                 where: {
                     AND: [
-                        { postId: body.data.post },
-                        { userId: body.data.user  }
+                        { post_id: body.data.post },
+                        { user_id: body.data.user  }
                     ],
                 }
             })
