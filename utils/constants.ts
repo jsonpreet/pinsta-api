@@ -5,6 +5,10 @@ export const EVER_ACCESS_KEY = process.env.EVER_ACCESS_KEY as string
 export const EVER_ACCESS_SECRET = process.env.EVER_ACCESS_SECRET as string
 export const EVER_REGION = 'us-west-2'
 
+export const WAV3S_TOKEN = process.env.WAV3S_TOKEN as string
+
+export const WAV3S_URL = 'https://wav3s-app-dot-quant-cripto-fund.uc.r.appspot.com'
+
 export const LENS_ENV = process.env.NEXT_PUBLIC_ENVIRONMENT
 export const IS_MAINNET = LENS_ENV === 'mainnet'
 
